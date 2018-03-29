@@ -1,0 +1,46 @@
+spring:
+  application:
+      name: coupon
+  redis:
+    host: alcava00.synology.me
+    port: 16379
+    pool:
+      max-active: 200
+      min-idle: 10
+      max-idle: 10
+      max-wait: 30000
+    timeout: 60000
+
+  session:
+    store-type: hash_map
+  mvc:
+    favicon:
+      enabled: false
+    throw-exception-if-no-handler-found: true
+    locale: ko_KR
+  resources:
+    add-mappings: true
+
+  messages:
+    basename: messages/error
+    always-use-message-format: true
+  jackson:
+    date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
+
+debug: true
+
+logging:
+  level:
+    com.example.coupon: DEBUG
+
+coupon:
+  #오류 처리 관련
+  defaultErrorCode: E0000
+  defaultExceptionHttpStatus: INTERNAL_SERVER_ERROR
+
+  #coupon id 발급 관련 설정
+  uniqueIdcharSet: 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
+  uniqueIdsize: 16
+  uniqueIdBlockSize: 4
+  useIdBlockSeparator: true
+

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Coupon List</title>
+
+    <!-- 부트스트랩 -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<br>
+
+<div class="container">
+    <div class="row">
+        <h2>Coupon List</h2>
+    </div>
+    <div class="row">
+        <div class="col">
+            <form class="navbar-form navbar-left" role="search">
+                <div class="form-group">
+                    <label for="emailInput">Email address</label>
+                    <input type="email" value="" class="form-control" id="emailInput"
+                           placeholder="name@example.com">
+                    <button id="btn"  class="btn btn-default">Submit</button>
+                    <button id="searchBtn"  class="btn btn-default">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">COUPON</th>
+                <th scope="col">EMAIL</th>
+                <th scope="col">DateTime</th>
+            </tr>
+            </thead>
+            <tbody id="datas">
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4" id="result_summary"></div>
+        <div class="col-lg-8">
+            <nav>
+                <ul class="pagination" id="pagination"></ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+<script>
+    searchAll  ();
+    $('#searchBtn').on('click', searchAll);
+
+    $('#btn').on('click', function () {
+        var email = $('#emailInput').val();
+        var ob = {};
+        ob.email = email;
+        var data = JSON.stringify(ob);
+
+        $.ajax({
+            url: 'http://127.0.0.1:8080/api/coupons/',
+            dataType: 'json',
+            type: 'post',
+            contentType: 'application/json',
+            data: data,
+            processData: false,
+            xhrFields: {cors: false},
+            success: function (data, textStatus, jQxhr) {
+                alert("success");
+                searchAll();
+            },
+            error: function ( jqXhr, textStatus, errorThrown) {
+                alert(  jQuery.parseJSON(jqXhr.responseText ).message );
+                console.log(errorThrown);
+            }
+        });
+    });
+
+    function bindingData (data, textStatus, jQxhr) {
+        var totalPages=data.totalPages;
+        var totalCount=data.totalElements;
+        var number=data.number;
+
+        var html='';
+        $.each(data.content, function (index, value) {
+            html=html+ '<tr><th>'+value.id+'</th>'
+                + '<td>'+value.couponId+'</td>'
+                + '<td>'+value.email+'</td>'
+                + '<td>'+value.createdDate+'</td></tr>';
+        });
+        console.log(html);
+        $('#datas').html(html);
+        showPagination(totalPages,totalCount,number+1,searchAll);
+    }
+    function searchAll(page) {
+        $.ajax({
+            url: '/api/coupons?size=10&page=' + page,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            processData: false,
+            xhrFields: {cors: false},
+            success: bindingData,
+            error: function (jqXhr, textStatus, errorThrown) {
+                alert(  jQuery.parseJSON(jqXhr.responseText ).message );
+            }
+        });
+    }
+    function showPagination(totalPage,totalRowCount,currentPage,searchFunction){
+
+        var rowPerPage=10;  //한페이지 당 최대 Row 수
+
+        var maxPageCount=10; //Pagination 에서 보여줄 최대 페이지수 rowPerPage 가 아님
+
+        var startPage=1; //최초 페이지 페이지 번호
+        var endPage=totalPage;  //마지막 페이지 번호
+        var currentPageSize=totalPage;
+        var multiple= Math.floor ((currentPage-1)/maxPageCount);
+
+        var previousPageGroup=0;
+        var nextPageGroup=0;
+        var currentPageGroupStart=1;
+        var currentPageGroupEnd=maxPageCount;
+
+        var previousPage=0;
+        var nextPage=0;
+
+        if(currentPage>maxPageCount){
+            startPage=Number(maxPageCount*multiple)+1;
+        }
+
+        //isNotFirstPageGroup
+        if(multiple>0){
+            previousPageGroup=Number(((multiple-1)*maxPageCount))+1;
+        }
+
+        currentPageGroupStart=(multiple*maxPageCount)+1;
+
+        nextPageGroup=(maxPageCount*(multiple+1))+1;
+
+        //isNotLastPageGroup
+        if(nextPageGroup>=totalPage){
+            nextPageGroup=0;
+        }
+
+        //isNotFirstPage
+        if(currentPage>1){
+            previousPage=Number(currentPage) -1;
+        }
+
+        //isNotLastPage
+        if(currentPage<totalPage){
+            nextPage=Number(currentPage)+1;
+        }
+
+        if(nextPageGroup!=0){
+            endPage=nextPageGroup-1;
+        }else{
+            endPage=totalPage;
+        }
+
+        console.log('startPage >> ' + startPage);
+        console.log('endPage >> ' + endPage);
+        console.log('previousPageGroup >> ' + previousPageGroup);
+        console.log('currentPageGroupStart >> ' + currentPageGroupStart);
+        console.log('multiple >> ' + multiple);
+        console.log('nextPageGroup >> ' + nextPageGroup);
+        console.log('previousPage >> ' + previousPage);
+        console.log('nextPage >> ' + nextPage);
+        console.log('currentPage >> ' + currentPage);
+        console.log('totalPage >> ' + totalPage);
+
+        // 조회 건수 및 페이지수 표시
+        var content = ["No result", "total count :"+totalRowCount + " total page:"+totalPage];
+        var tpl_summary = ["<h3><span class='label label-info'>", content[Math.min(totalRowCount, 1)], "</span></h3>"].join('');
+        $('#result_summary').html(tpl_summary);
+
+
+        function format(value, text){
+            var result = '';
+
+            if(value!=0){
+                result = "<li><a pageid='"+value+"' href='#'>"+text+"</a></li>";
+            }else{
+                result = "<li class='disabled'><a disabled>"+text+"</a></li>";
+            }
+
+            return result;
+        }
+        // clear pagination
+        $pagination = $('#pagination');
+        $pagination.html('');
+
+        // previous
+        $pagination.append(format(previousPageGroup, '&laquo;'));
+        $pagination.append(format(previousPage, 'Previous'));
+
+        // page
+        for(var i=startPage ;i<=endPage;i++){
+            if(i==currentPage){
+                $pagination.append("<li class='active hidden-xs hidden-sm'><a pageid='"+i+"' href='#' >"+i+"</a></li>");
+            }else{
+                $pagination.append("<li class='hidden-xs hidden-sm'><a pageid='"+i+"' href='#' >"+i+"</a></li>");
+            }
+        }
+
+        // next
+        $pagination.append(format(nextPage, 'Next'));
+        $pagination.append(format(nextPageGroup, '&raquo;'));
+
+        $('#pagination a:not([disabled])').click(function(){
+            searchFunction( Number ( $(this).attr('pageid'))-1 );
+        }) ;
+    }
+
+</script>
+</body>
+</html>
