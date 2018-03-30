@@ -95,6 +95,7 @@ public class CouponService {
         logger.debug("total count : {}", coupons.getTotalElements());
         return coupons;
     }
+
     public Coupon getCouponById(@PathVariable String couponId) {
         return couponRepository.findOne(couponId);
     }

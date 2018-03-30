@@ -34,7 +34,8 @@ public class RandomUniqueIdGenerator implements UniqueIdGenerator {
         int resultSize =useIdBlockSeparator? size + (size / idBlockSize) - 1:size; //구분자를 포함한 길이
         char[] resultArray = new char[resultSize];  //결과값 저장
 
-        SecureRandom randomno = new SecureRandom();
+//        SecureRandom randomno = new SecureRandom();
+        CustomRamdom randomno=new CustomRamdom(); //<--- 이것도 만들어야 되는건지 ????
         randomno.nextBytes(randomByte);
 
         int resultArrayPosition = 0; // resultArray
