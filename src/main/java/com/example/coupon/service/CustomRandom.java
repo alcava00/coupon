@@ -5,15 +5,21 @@ import com.example.coupon.config.CouponProperties;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by alcava00 on 2018. 3. 30..
  */
-public class CustomRamdom {
+public class CustomRandom {
     private static AtomicLong atomicLong = new AtomicLong();
 
     static {
+        ThreadFactory threadFactory=(runnable)->{
+            Thread thread=new Thread(runnable);
+            thread.setDaemon(true);
+            return thread;
+        };
         Executors.newFixedThreadPool(1).execute(() -> {
             while (true) {  atomicLong.incrementAndGet(); }
         });
@@ -34,7 +40,7 @@ public class CustomRamdom {
             oldseed = atomicLong.get();
             nextseed = (722313 * oldseed + 2132131233);
         } while (!atomicLong.compareAndSet(oldseed, nextseed));
-        return atomicLong.incrementAndGet();
+        return atomicLong.get();
     }
 
 }

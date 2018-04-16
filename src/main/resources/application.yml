@@ -2,8 +2,8 @@ spring:
   application:
       name: coupon
   redis:
-    host: alcava00.synology.me
-    port: 16379
+    host: 127.0.0.1
+    port: 6379
     pool:
       max-active: 200
       min-idle: 10

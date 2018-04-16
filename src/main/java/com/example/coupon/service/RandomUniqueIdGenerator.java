@@ -3,8 +3,6 @@ package com.example.coupon.service;
 import com.example.coupon.config.CouponProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.security.SecureRandom;
-
 /**
  * Created by alcava00 on 2018. 3. 26..
  */
@@ -35,7 +33,7 @@ public class RandomUniqueIdGenerator implements UniqueIdGenerator {
         char[] resultArray = new char[resultSize];  //결과값 저장
 
 //        SecureRandom randomno = new SecureRandom();
-        CustomRamdom randomno=new CustomRamdom(); //<--- 이것도 만들어야 되는건지 ????
+        CustomRandom randomno=new CustomRandom(); //<--- 이것도 만들어야 되는건지 ????
         randomno.nextBytes(randomByte);
 
         int resultArrayPosition = 0; // resultArray
